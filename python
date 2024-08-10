@@ -1,0 +1,93 @@
+# Character class
+class Character:
+    def __init__(self, name, health, attack, defense):
+        self.name = name
+        self.health = health
+        self.attack = attack
+        self.defense = defense
+        self.inventory = []
+
+    def is_alive(self):
+        return self.health > 0
+
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health < 0:
+            self.health = 0
+
+    def attack_target(self, target):
+        damage = self.attack - target.defense
+        if damage > 0:
+            target.take_damage(damage)
+        return damage
+
+    def add_to_inventory(self, item):
+        self.inventory.append(item)
+
+    def show_inventory(self):
+        return ", ".join(self.inventory) if self.inventory else "empty"
+
+# Create the player
+def create_character():
+    print("Welcome to the RPG game!")
+    name = input("Enter your character's name: ")
+    return Character(name, 100, 20, 10)
+
+# Create an enemy
+def create_enemy():
+    return Character("Goblin", 50, 15, 5)
+
+# Simple story
+def story():
+    print("\nYou are a warrior on a quest to save the kingdom from a terrible evil.")
+    print("Your journey begins in a dark forest where you encounter a wild Goblin!")
+
+# Combat system
+def combat(player, enemy):
+    print(f"\n{enemy.name} appears!")
+    while enemy.is_alive() and player.is_alive():
+        print(f"\nYour Health: {player.health}")
+        print(f"{enemy.name}'s Health: {enemy.health}")
+        action = input("\nDo you want to (A)ttack, (R)un, or (I)nventory? ").lower()
+        if action == 'a':
+            damage = player.attack_target(enemy)
+            print(f"You attack the {enemy.name} for {damage} damage!")
+            if enemy.is_alive():
+                damage = enemy.attack_target(player)
+                print(f"The {enemy.name} attacks you for {damage} damage!")
+        elif action == 'r':
+            print("You run away!")
+            break
+        elif action == 'i':
+            print(f"Your inventory: {player.show_inventory()}")
+            item = input("Enter item to use or press Enter to continue: ")
+            if item in player.inventory:
+                print(f"You used {item}.")
+                player.inventory.remove(item)
+            else:
+                print("Item not found in inventory.")
+        else:
+            print("Invalid action. Please choose (A)ttack, (R)un, or (I)nventory.")
+    
+    if not player.is_alive():
+        print("\nYou have been defeated! Game over.")
+    elif not enemy.is_alive():
+        print(f"\nYou have defeated the {enemy.name}! Congratulations!")
+        player.add_to_inventory("Goblin Tooth")  # Example item drop
+
+# Main game function
+def game():
+    player = create_character()
+    story()
+    while player.is_alive():
+        enemy = create_enemy()
+        combat(player, enemy)
+
+        if player.is_alive():
+            print("\nYour journey continues...")
+            # You can add more story progression or encounters here
+        else:
+            print("\nGame Over")
+
+if __name__ == "__main__":
+    game()
